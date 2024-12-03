@@ -1,0 +1,47 @@
+@keyframes plate-collision {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-100px);
+  }
+}
+
+@keyframes himalaya-growth {
+  0%, 100% {
+    transform: scaleY(1) translateY(0);
+  }
+  50% {
+    transform: scaleY(2) translateY(-75px);
+  }
+}
+
+@keyframes subduction {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(50px);
+  }
+}
+
+.animate-plate-collision .indian-plate {
+  animation: plate-collision 10s ease-in-out infinite;
+}
+
+.animate-plate-collision .eurasian-plate {
+  animation: plate-collision 10s ease-in-out infinite reverse;
+}
+
+.animate-plate-collision .himalayas {
+  animation: himalaya-growth 10s ease-in-out infinite;
+}
+
+.animate-plate-collision .subduction-zone {
+  animation: subduction 10s ease-in-out infinite;
+}
+
+.animate-plate-collision .himalaya-label {
+  animation: himalaya-growth 10s ease-in-out infinite;
+}
+

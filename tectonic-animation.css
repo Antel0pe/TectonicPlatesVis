@@ -1,0 +1,30 @@
+@keyframes plate-movement {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-plate-movement .indian-plate {
+  animation: plate-movement 10s ease-in-out infinite;
+}
+
+.animate-plate-movement .eurasian-plate {
+  animation: plate-movement 10s ease-in-out infinite reverse;
+}
+
+.animate-plate-movement .himalayas {
+  animation: himalaya-growth 10s ease-in-out infinite;
+}
+
+@keyframes himalaya-growth {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.2);
+  }
+}
+
