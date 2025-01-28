@@ -36,20 +36,24 @@ export default function PaleoGeographyGlobe() {
             let simplifiedData = []
             for (const f of validFeatures) {
                 try {
-                    let simplified = turf.simplify(f, { tolerance: 1000, highQuality: false, mutate: false })
+                    let simplified = turf.simplify(f, { tolerance: 0.1, highQuality: true, })
                     simplifiedData.push(simplified)
                 } catch (err) {
                     console.error(err)
                     console.error(f)
                 }
             }
-            console.log(simplifiedData)
+            const bigPolygons = simplifiedData.filter((d) => turf.area(d) > 10000000000000)
+            console.log(bigPolygons)
+            console.log(bigPolygons.filter(f => turf.booleanValid(f)));
 
-            const unionPolygons = turf.union(turf.featureCollection(...simplifiedData.map((s) => turf.feature(s.geometry))))
+            const unionPolygons = turf.union(turf.featureCollection(bigPolygons))
             console.log(unionPolygons)
-            // console.log(data)
-            // const simplifiedData = validFeatures.map((d) => simplify(d, { tolerance: 0.01, highQuality: false }))
-            // console.log(simplifiedData)
+
+            // const enhanced = turf.buffer(unionPolygons, 0, { steps: 8 });
+            // console.log(enhanced)
+
+
 
 
             // const polygons: [number, number][][][] = unionPolygons
@@ -89,6 +93,62 @@ export default function PaleoGeographyGlobe() {
 
             // console.log(mergedGeometry)
 
+            // const testPolygon = {
+            //     "type": "Feature",
+            //     "properties": {},
+            //     "geometry": {
+            //         "type": "Polygon",
+            //         "coordinates": [
+            //             [
+            //                 [
+            //                     -49,
+            //                     -37
+            //                 ],
+            //                 [
+            //                     -24,
+            //                     -46
+            //                 ],
+            //                 [
+            //                     -24,
+            //                     -45
+            //                 ],
+            //                 [
+            //                     -32,
+            //                     -61
+            //                 ],
+            //                 [
+            //                     4,
+            //                     -62
+            //                 ],
+            //                 [
+            //                     16,
+            //                     -34
+            //                 ],
+            //                 [
+            //                     -11,
+            //                     -21
+            //                 ],
+            //                 [
+            //                     -11,
+            //                     -22
+            //                 ],
+            //                 [
+            //                     -49,
+            //                     -8
+            //                 ],
+            //                 [
+            //                     -49,
+            //                     -37
+            //                 ]
+            //             ]
+            //         ]
+            //     },
+            //     "__id": "408991329"
+            // }
+            // const smoothedPolygon = densifyPolygon(testPolygon);
+            // setPolygonData([smoothedPolygon]);
+            // setPolygonData([testPolygon]);
+
             setPolygonData([unionPolygons])
             setLoading(false)
         } catch (err) {
@@ -101,6 +161,28 @@ export default function PaleoGeographyGlobe() {
     useEffect(() => {
         fetchData()
     }, [fetchData])
+
+    const densifyPolygon = (feature: any) => {
+        const coords = feature.geometry.coordinates[0];
+        let denseCoords = [];
+
+        for (let i = 0; i < coords.length - 1; i++) {
+            const start = turf.point(coords[i]);
+            const end = turf.point(coords[i + 1]);
+            const arc = turf.greatCircle(start, end, { npoints: 20 });
+            denseCoords.push(...arc.geometry.coordinates);
+        }
+
+        return {
+            ...feature,
+            geometry: {
+                ...feature.geometry,
+                coordinates: [[...denseCoords, denseCoords[0]]] // Close the polygon
+            }
+        };
+    };
+
+
 
     if (error) {
         return (
@@ -118,19 +200,29 @@ export default function PaleoGeographyGlobe() {
                 </div>
             )}
             <Globe
+                // rendererConfig={{
+                //     logarithmicDepthBuffer: true,
+                //     depth: false,
+                // }}
                 // globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
-                backgroundColor="rgba(0,0,0,0)"
+                // backgroundColor="rgba(0,0,0,1)"
+                // atmosphereColor="rgba(0,0,0,1)"
                 polygonsData={polygonData}
-                // polygonGeoJsonGeometry={(d:any) => d.geometry}
-                polygonCapColor={(obj: any) => obj.properties?.capColor}
-                polygonSideColor={(obj: any) => obj.properties?.sideColor}
-                polygonStrokeColor={(obj: any) => obj.properties?.strokeColor}
-                // atmosphereColor="rgba(0,0,0,0)"
-                // polygonAltitude={0.01}
-                polygonAltitude={(obj: any) => obj.properties?.altitude}
+            // polygonGeoJsonGeometry={(d:any) => d.geometry}
+            // polygonCapColor={(obj: any) => obj.properties?.capColor || 'rgba(255, 0, 0, 0.8)'}
+            // polygonSideColor={(obj: any) => obj.properties?.sideColor || 'rgba(0,0,0,0)'}
+            // polygonStrokeColor={(obj: any) => obj.properties?.strokeColor || 'rgba(0,0,0,0)'}
+            // polygonCapColor={() => 'rgba(255, 0, 0, 0.8)'}
+            // polygonSideColor={() => 'rgba(255, 0, 0, 0.3)'}
+            // polygonAltitude={() => 0.00001}
+            // showAtmosphere={true}
+            // atmosphereColor="rgba(0,0,0,0)"
+            // polygonAltitude={0.01}
+            // polygonAltitude={(obj: any) => obj.properties?.altitude}
             // polygonStrokeColor={() => '#111'}
             // polygonAltitude={0}
-            // polygonsTransitionDuration={0}
+            // polygonsTransitionDuration={1000}
+
             // width={window.innerWidth}
             // height={window.innerHeight - 100}
             />
