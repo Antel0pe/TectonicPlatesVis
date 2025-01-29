@@ -1,0 +1,13 @@
+{
+  "ZAHIROVIC2022": {
+    "start": 410,
+    "end": 0,
+    "filepath": "/data/ZAHIROVIC2022/_.geojson"
+  },
+  "MULLER2022": {
+    "start": 1000,
+    "end": 0,
+    "filepath": "/data/MULLER2022/_.geojson"
+  }
+}
+

@@ -1,17 +1,17 @@
 "use client"
 
-import dynamic from "next/dynamic";
+import dynamic from "next/dynamic"
 
-const CesiumGlobe = dynamic(() => import("../components/cesium-globe"), {
-  ssr: false, // Prevents this component from being rendered on the server
-});
+const ReconstructedCoastlinesMap = dynamic(() => import("../components/ReconstructedCoastlinesMap"), {
+  ssr: false,
+  loading: () => <div className="h-screen flex items-center justify-center">Loading map...</div>,
+})
 
-export default function Page() {
+export default function Home() {
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4 text-center">Tectonic Plate Boundaries (GPlates)</h1>
-      <CesiumGlobe />
-    </div>
+    <main className="h-screen">
+      <ReconstructedCoastlinesMap />
+    </main>
   )
 }
 

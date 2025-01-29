@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "cesium/Build/Cesium/Widgets/widgets.css";
-
 body {
   font-family: Arial, Helvetica, sans-serif;
 }

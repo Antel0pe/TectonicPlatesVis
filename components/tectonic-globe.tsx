@@ -36,7 +36,7 @@ export default function PaleoGeographyGlobe() {
             let simplifiedData = []
             for (const f of validFeatures) {
                 try {
-                    let simplified = turf.simplify(f, { tolerance: 0.1, highQuality: true, })
+                    let simplified = turf.simplify(f, { tolerance: 1, highQuality: true, })
                     simplifiedData.push(simplified)
                 } catch (err) {
                     console.error(err)
@@ -93,58 +93,57 @@ export default function PaleoGeographyGlobe() {
 
             // console.log(mergedGeometry)
 
-            // const testPolygon = {
-            //     "type": "Feature",
-            //     "properties": {},
-            //     "geometry": {
-            //         "type": "Polygon",
-            //         "coordinates": [
-            //             [
-            //                 [
-            //                     -49,
-            //                     -37
-            //                 ],
-            //                 [
-            //                     -24,
-            //                     -46
-            //                 ],
-            //                 [
-            //                     -24,
-            //                     -45
-            //                 ],
-            //                 [
-            //                     -32,
-            //                     -61
-            //                 ],
-            //                 [
-            //                     4,
-            //                     -62
-            //                 ],
-            //                 [
-            //                     16,
-            //                     -34
-            //                 ],
-            //                 [
-            //                     -11,
-            //                     -21
-            //                 ],
-            //                 [
-            //                     -11,
-            //                     -22
-            //                 ],
-            //                 [
-            //                     -49,
-            //                     -8
-            //                 ],
-            //                 [
-            //                     -49,
-            //                     -37
-            //                 ]
-            //             ]
-            //         ]
-            //     },
-            //     "__id": "408991329"
-            // }
+            const testPolygon = {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [
+                                -49,
+                                -37
+                            ],
+                            [
+                                -24,
+                                -46
+                            ],
+                            [
+                                -24,
+                                -45
+                            ],
+                            [
+                                -32,
+                                -61
+                            ],
+                            [
+                                4,
+                                -62
+                            ],
+                            [
+                                16,
+                                -34
+                            ],
+                            [
+                                -11,
+                                -21
+                            ],
+                            [
+                                -11,
+                                -22
+                            ],
+                            [
+                                -49,
+                                -8
+                            ],
+                            [
+                                -49,
+                                -37
+                            ]
+                        ]
+                    ]
+                },
+            }
             // const smoothedPolygon = densifyPolygon(testPolygon);
             // setPolygonData([smoothedPolygon]);
             // setPolygonData([testPolygon]);
@@ -200,10 +199,10 @@ export default function PaleoGeographyGlobe() {
                 </div>
             )}
             <Globe
-                // rendererConfig={{
-                //     logarithmicDepthBuffer: true,
-                //     depth: false,
-                // }}
+                rendererConfig={{
+                    // logarithmicDepthBuffer: true,
+                    // depth: false,
+                }}
                 // globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
                 // backgroundColor="rgba(0,0,0,1)"
                 // atmosphereColor="rgba(0,0,0,1)"
@@ -212,12 +211,12 @@ export default function PaleoGeographyGlobe() {
             // polygonCapColor={(obj: any) => obj.properties?.capColor || 'rgba(255, 0, 0, 0.8)'}
             // polygonSideColor={(obj: any) => obj.properties?.sideColor || 'rgba(0,0,0,0)'}
             // polygonStrokeColor={(obj: any) => obj.properties?.strokeColor || 'rgba(0,0,0,0)'}
-            // polygonCapColor={() => 'rgba(255, 0, 0, 0.8)'}
-            // polygonSideColor={() => 'rgba(255, 0, 0, 0.3)'}
+            polygonCapColor={() => 'rgba(255, 0, 0, 0.8)'}
+            polygonSideColor={() => 'rgba(255, 0, 0, 0.3)'}
             // polygonAltitude={() => 0.00001}
             // showAtmosphere={true}
             // atmosphereColor="rgba(0,0,0,0)"
-            // polygonAltitude={0.01}
+            polygonAltitude={0.01}
             // polygonAltitude={(obj: any) => obj.properties?.altitude}
             // polygonStrokeColor={() => '#111'}
             // polygonAltitude={0}
