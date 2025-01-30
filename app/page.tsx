@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic"
 
-const ReconstructedCoastlinesMap = dynamic(() => import("../components/ReconstructedCoastlinesMap"), {
+const Map = dynamic(() => import("../components/Map"), {
   ssr: false,
   loading: () => <div className="h-screen flex items-center justify-center">Loading map...</div>,
 })
@@ -10,7 +10,7 @@ const ReconstructedCoastlinesMap = dynamic(() => import("../components/Reconstru
 export default function Home() {
   return (
     <main className="h-screen">
-      <ReconstructedCoastlinesMap />
+      <Map />
     </main>
   )
 }
