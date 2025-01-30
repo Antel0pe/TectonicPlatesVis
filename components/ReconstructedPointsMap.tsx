@@ -67,7 +67,7 @@ const ReconstructedPointsMap = ({ model, time, setIsLoading }: Props) => {
                 },
                 body: JSON.stringify({
                     feature_collection: featureCollection,
-                    reconstruction_time: time,
+                    time: time,
                     model: model
                 })
             })

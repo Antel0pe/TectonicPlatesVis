@@ -2,15 +2,26 @@ import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
     try {
-        const body = await request.json()
-        console.log('Received in API:', body)
-        const response = await fetch('https://gws.gplates.org/reconstruct/reconstruct_feature_collection/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body)
-        })
+        const body = await request.json();
+        console.log('Received in API:', body);
+
+        const formData = {
+            feature_collection: JSON.stringify(body.feature_collection),
+            keep_properties: 'true',
+            time: body.time.toString(),
+            model: body.model
+        };
+
+        const response = await fetch(
+            'https://gws.gplates.org/reconstruct/reconstruct_feature_collection/',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams(formData).toString()
+            }
+        );
 
         if (!response.ok) {
             const errorText = await response.text()

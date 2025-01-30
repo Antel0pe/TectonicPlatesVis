@@ -52,7 +52,7 @@ const Map: React.FC = () => {
     }, [isPlaying, isLoading, currentModelConfig])
 
     const handlePlayPause = () => {
-        if (!isPlaying) {
+        if (!isPlaying && time <= currentModelConfig.end) {
             setTime(currentModelConfig.start)
         }
         setIsPlaying(!isPlaying)
