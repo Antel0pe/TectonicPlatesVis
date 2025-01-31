@@ -5,6 +5,8 @@ export async function POST(request: Request) {
         const body = await request.json();
         console.log('Received in API:', body);
 
+        if (body.time === 0) return NextResponse.json(body.feature_collection)
+
         const formData = {
             feature_collection: JSON.stringify(body.feature_collection),
             keep_properties: 'true',

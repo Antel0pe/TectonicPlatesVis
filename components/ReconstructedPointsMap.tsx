@@ -22,11 +22,12 @@ const ReconstructedPointsMap = ({ model, time, setIsLoading }: Props) => {
         setIsLoading(true)
         try {
             // Calculate min_ma based on time prop
-            const minMa = time - 9
+            const minMa = Math.max(0, time - 9)
+            const timeStr = minMa === 0 ? `max_ma=${time}` : `max_ma=${time}&min_ma=${minMa}`
             
             // Fetch paleobio data
             const paleobioResponse = await fetch(
-                `https://paleobiodb.org/data1.2/occs/list.json?base_name=cynodontia,mammalia&min_ma=${minMa}&max_ma=${time}&show=coords,loc,time,phylo`
+                `https://paleobiodb.org/data1.2/occs/list.json?base_name=cynodontia,mammalia&${timeStr}&show=coords,loc,time,phylo`
             )
             if (!paleobioResponse.ok) {
                 throw new Error('Failed to fetch paleobio data')
