@@ -22,8 +22,7 @@ const ReconstructedPointsMap = ({ model, time, setIsLoading }: Props) => {
         setIsLoading(true)
         try {
             // Calculate min_ma based on time prop
-            const minMa = Math.max(0, time - 9)
-            const timeStr = minMa === 0 ? `max_ma=${time}` : `max_ma=${time}&min_ma=${minMa}`
+            const timeStr = time === 0 ? `max_ma=${1}&min_ma=${0}` : `max_ma=${time}&min_ma=${time - 9}`
             
             // Fetch paleobio data
             const paleobioResponse = await fetch(
@@ -33,9 +32,10 @@ const ReconstructedPointsMap = ({ model, time, setIsLoading }: Props) => {
                 throw new Error('Failed to fetch paleobio data')
             }
             const paleobioData = await paleobioResponse.json()
+            console.log(paleobioData)
 
             // Create GeoJSON FeatureCollection from paleobio data
-            const features: Feature[] = paleobioData.records
+            const features: Feature[] = paleobioData.records.slice(1000)
                 .filter((record: any) => record.lng && record.lat)
                 .map((record: any): Feature => ({
                     type: 'Feature',
@@ -49,6 +49,7 @@ const ReconstructedPointsMap = ({ model, time, setIsLoading }: Props) => {
                         age: record.max_ma
                     }
                 }))
+            console.log(features)
 
             const featureCollection: FeatureCollection = {
                 type: 'FeatureCollection',
