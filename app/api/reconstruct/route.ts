@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        console.log('Received in API:', body);
+        // console.log('Received in API:', body);
 
         if (body.time === 0) return NextResponse.json(body.feature_collection)
 
@@ -13,6 +13,8 @@ export async function POST(request: Request) {
             time: body.time.toString(),
             model: body.model
         };
+
+        // console.log(new URLSearchParams(formData).toString())
 
         const response = await fetch(
             'https://gws.gplates.org/reconstruct/reconstruct_feature_collection/',

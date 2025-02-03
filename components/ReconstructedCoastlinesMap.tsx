@@ -10,7 +10,7 @@ import { ModelConfig } from "./Map"
 
 
 
-const fileExists = async (url: string): Promise<boolean> => {
+export const fileExists = async (url: string): Promise<boolean> => {
     try {
         const response = await fetch(url, { method: "HEAD" })
         return response.ok
