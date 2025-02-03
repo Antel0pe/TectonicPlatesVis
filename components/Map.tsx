@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect, useCallback } from "react"
-import { MapContainer, TileLayer, GeoJSON } from "react-leaflet"
+import { MapContainer, TileLayer, GeoJSON, LayersControl } from "react-leaflet"
 import { PlayCircle, PauseCircle } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
@@ -12,8 +12,7 @@ import modelsConfig from "../models-config.json"
 import type { GeoJsonObject } from 'geojson';
 import ReconstructedCoastlinesMap from "./ReconstructedCoastlinesMap"
 import ReconstructedPointsMap from "./ReconstructedPointsMap"
-
-
+import ElevationMap from "./ElevationMap"
 
 export interface ModelConfig {
     start: number
@@ -21,12 +20,30 @@ export interface ModelConfig {
     filepath: string
 }
 
+const LAYERS = {
+    tectonicPlates: {
+        name: "Tectonic Plates",
+        component: ReconstructedCoastlinesMap
+    },
+    mammalFossils: {
+        name: "Mammal Fossils",
+        component: ReconstructedPointsMap
+    },
+    elevation: {
+        name: "Elevation",
+        component: ElevationMap
+    }
+};
 
+type LayerVisibility = Record<keyof typeof LAYERS, boolean>;
 const Map: React.FC = () => {
     const [model, setModel] = useState<keyof typeof modelsConfig>("ZAHIROVIC2022")
     const [time, setTime] = useState(modelsConfig[model].start)
     const [isPlaying, setIsPlaying] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [visibleLayers, setVisibleLayers] = useState<LayerVisibility>(
+        Object.keys(LAYERS).reduce((acc, key) => ({ ...acc, [key]: true }), {})
+    );
 
     const currentModelConfig = modelsConfig[model] as ModelConfig
 
@@ -71,8 +88,25 @@ const Map: React.FC = () => {
                     zoom={2}
                     style={{ height: "100%", width: "100%" }}
                 >
-                    <ReconstructedCoastlinesMap model={model} time={time} setIsLoading={setIsLoading} />
-                    <ReconstructedPointsMap model={model} time={time} setIsLoading={setIsLoading}  />
+                    <LayersControl position="topright">
+                        {(Object.keys(LAYERS)  as Array<keyof typeof LAYERS>).map(key => {
+                            const layer = LAYERS[key as keyof typeof LAYERS];
+                            return (
+                                <LayersControl.Overlay
+                                    key={key}
+                                    checked={visibleLayers[key]}
+                                    name={layer.name}
+                                >
+                                    {visibleLayers[key] && (
+                                        <layer.component
+                                            model={model}
+                                            time={time}
+                                            setIsLoading={setIsLoading}
+                                        />
+                                    )}
+                                </LayersControl.Overlay>)
+                        })}
+                    </LayersControl>
                 </MapContainer>
             </div>
             <div className="bg-black text-white p-4 flex items-center space-x-4">
