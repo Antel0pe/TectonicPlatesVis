@@ -23,7 +23,6 @@ export interface ModelConfig {
 
 
 const Map: React.FC = () => {
-    const [coastlines, setCoastlines] = useState<GeoJsonObject | null>(null)
     const [model, setModel] = useState<keyof typeof modelsConfig>("ZAHIROVIC2022")
     const [time, setTime] = useState(modelsConfig[model].start)
     const [isPlaying, setIsPlaying] = useState(false)
@@ -44,7 +43,7 @@ const Map: React.FC = () => {
                     }
                     return newTime
                 })
-            }, 2500)
+            }, 1000)
         }
         return () => {
             if (timeout) clearTimeout(timeout)

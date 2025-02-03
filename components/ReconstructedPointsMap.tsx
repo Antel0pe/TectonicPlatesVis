@@ -23,67 +23,67 @@ const ReconstructedPointsMap = ({ model, time, setIsLoading }: Props) => {
         setIsLoading(true)
         try {
 
-            const filePath = `/data/paleobiodb_cynodontia,mammalia/${time}.json`
-            const fileExistsLocally = await fileExists(filePath)
+            // const filePath = `/data/paleobiodb_cynodontia,mammalia/${time}.json`
+            // const fileExistsLocally = await fileExists(filePath)
 
-            let paleobioData
-            if (fileExistsLocally) {
-                const response = await fetch(filePath)
-                if (!response.ok) throw new Error("Failed to fetch local paleobiodb file")
-                paleobioData = await response.json()
-            } else {
-                // File doesn't exist locally, fallback to API request
-                // Calculate min_ma based on time prop
-                const timeStr = time === 0 ? `max_ma=${1}&min_ma=${0}` : `max_ma=${time}&min_ma=${time - 9}`
+            // let paleobioData
+            // if (fileExistsLocally) {
+            //     const response = await fetch(filePath)
+            //     if (!response.ok) throw new Error("Failed to fetch local paleobiodb file")
+            //     paleobioData = await response.json()
+            // } else {
+            //     // File doesn't exist locally, fallback to API request
+            //     // Calculate min_ma based on time prop
+            //     const timeStr = time === 0 ? `max_ma=${1}&min_ma=${0}` : `max_ma=${time}&min_ma=${time - 9}`
 
-                // Fetch paleobio data
-                const paleobioResponse = await fetch(
-                    `https://paleobiodb.org/data1.2/occs/list.json?base_name=cynodontia,mammalia&${timeStr}&show=coords,loc,time,phylo`
-                )
-                if (!paleobioResponse.ok) throw new Error(`Failed to fetch paleobiodb data from API: ${paleobioResponse.statusText}`)
-                paleobioData = await paleobioResponse.json()
-            }
+            //     // Fetch paleobio data
+            //     const paleobioResponse = await fetch(
+            //         `https://paleobiodb.org/data1.2/occs/list.json?base_name=cynodontia,mammalia&${timeStr}&show=coords,loc,time,phylo`
+            //     )
+            //     if (!paleobioResponse.ok) throw new Error(`Failed to fetch paleobiodb data from API: ${paleobioResponse.statusText}`)
+            //     paleobioData = await paleobioResponse.json()
+            // }
 
-            // Create GeoJSON FeatureCollection from paleobio data
-            const features: Feature[] = paleobioData
-                .filter((record: any) => record.lng && record.lat)
-                .map((record: any): Feature => ({
-                    type: 'Feature',
-                    geometry: {
-                        type: 'Point',
-                        coordinates: [parseFloat(record.lng), parseFloat(record.lat)]
-                    },
-                    properties: {
-                        id: record.occurrence_no,
-                        name: record.taxon_name,
-                        age: record.max_ma,
-                        color: record.color
-                    }
-                }))
-            // console.log(features)
+            // // Create GeoJSON FeatureCollection from paleobio data
+            // const features: Feature[] = paleobioData
+            //     .filter((record: any) => record.lng && record.lat)
+            //     .map((record: any): Feature => ({
+            //         type: 'Feature',
+            //         geometry: {
+            //             type: 'Point',
+            //             coordinates: [parseFloat(record.lng), parseFloat(record.lat)]
+            //         },
+            //         properties: {
+            //             id: record.occurrence_no,
+            //             name: record.taxon_name,
+            //             age: record.max_ma,
+            //             color: record.color
+            //         }
+            //     }))
+            // // console.log(features)
 
-            const featureCollection: FeatureCollection = {
-                type: 'FeatureCollection',
-                features: features
-            }
+            // const featureCollection: FeatureCollection = {
+            //     type: 'FeatureCollection',
+            //     features: features
+            // }
 
-            if (features.length === 0) {
-                console.error('No valid coordinates found in paleobio data')
-                return
-            }
+            // if (features.length === 0) {
+            //     console.error('No valid coordinates found in paleobio data')
+            //     return
+            // }
 
-            // Use Next.js API route instead of calling GPlates directly
-            const reconstructResponse = await fetch('/api/reconstruct', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    feature_collection: featureCollection,
-                    time: time,
-                    model: model
-                })
-            })
+            // // Use Next.js API route instead of calling GPlates directly
+            // const reconstructResponse = await fetch('/api/reconstruct', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify({
+            //         feature_collection: featureCollection,
+            //         time: time,
+            //         model: model
+            //     })
+            // })
 
             // console.log('sending to api')
             // console.log(JSON.stringify({
@@ -92,10 +92,13 @@ const ReconstructedPointsMap = ({ model, time, setIsLoading }: Props) => {
             //     model: model
             // }))
 
-            if (!reconstructResponse.ok) {
-                throw new Error('Failed to fetch reconstructed points')
-            }
-            const pointsData = await reconstructResponse.json()
+            // if (!reconstructResponse.ok) {
+            //     throw new Error('Failed to fetch reconstructed points')
+            // }
+
+            const response = await fetch(`/data/reconstructedPoints/${time}.geojson`)
+            if (!response.ok) throw new Error("Failed to fetch local reconstructed points file")
+            const pointsData = await response.json()
             console.log(pointsData)
             setPoints(pointsData)
         } catch (error) {
