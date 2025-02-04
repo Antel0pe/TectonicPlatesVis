@@ -1,168 +1,54 @@
-// import React, { useMemo } from 'react'
-// import { GeoJSON } from 'react-leaflet'
-// import L from 'leaflet'
-// import type { Feature, FeatureCollection, Point } from 'geojson'
-
-// const generateMockData = () => {
-//   const features: Feature[] = []
-
-//   // Generate points in a grid
-//   for (let lat = -89; lat <= 89; lat += 2) {
-//     for (let lon = -179; lon <= 179; lon += 2) {
-//       // Generate random elevation between -6000 (deep ocean) and 8000 (high mountains)
-//       const elevation = Math.random() * 14000 - 6000
-
-//       features.push({
-//         type: 'Feature',
-//         geometry: {
-//           type: 'Point',
-//           coordinates: [lon, lat]
-//         },
-//         properties: {
-//           elevation,
-//         }
-//       })
-//     }
-//   }
-
-//   return {
-//     type: 'FeatureCollection',
-//     features
-//   } as FeatureCollection
-// }
-
-// const getElevationColor = (elevation: number) => {
-//   // Color scheme: deep blue for deep ocean to white for high mountains
-//   if (elevation < -4000) return '#000080' // Deep blue for deep ocean
-//   if (elevation < -2000) return '#0000FF' // Blue for ocean
-//   if (elevation < 0) return '#4169E1'     // Royal blue for shallow water
-//   if (elevation < 500) return '#90EE90'   // Light green for lowlands
-//   if (elevation < 2000) return '#228B22'  // Forest green for hills
-//   if (elevation < 4000) return '#8B4513'  // Brown for mountains
-//   return '#FFFFFF'                        // White for peaks
-// }
-
-// const ElevationMap = () => {
-//   const points = useMemo(() => generateMockData(), [])
-
-//   return (
-//     <GeoJSON
-//       data={points}
-//       pointToLayer={(feature, latlng) => {
-//         const elevation = feature.properties?.elevation || 0
-
-//         return L.circleMarker(latlng, {
-//           radius: 4,
-//           fillColor: getElevationColor(elevation),
-//           color: '#000',
-//           weight: 1,
-//           opacity: 0.8,
-//           fillOpacity: 0.8,
-//         })
-//       }}
-//     />
-//   )
-// }
-
-// export default ElevationMap
-
-// ------------------------
 "use client"
-
-import type React from "react"
-import { useEffect, useState } from "react"
-import { MapContainer, TileLayer, GeoJSON } from "react-leaflet"
+import React, { useState, useEffect, useCallback, type Dispatch } from "react"
+import { GeoJSON } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
+import type { GeoJsonObject, Feature, Geometry, FeatureCollection } from 'geojson'
+import modelsConfig from "../models-config.json"
+import { ModelConfig } from "./Map"
+import L from 'leaflet'
+import type { LatLng } from 'leaflet'
+import { fileExists } from "./ReconstructedCoastlinesMap"
 
-interface ElevationData {
-    type: "FeatureCollection"
-    features: Array<{
-        type: "Feature"
-        properties: {
-            elevation: number
-        }
-        geometry: {
-            type: "Polygon"
-            coordinates: number[][][]
-        }
-    }>
+interface Props {
+    time: number;
+    setIsLoading: Dispatch<boolean>;
 }
 
-const generateElevationData = (): ElevationData => {
-    const features = []
-    for (let lat = -89; lat <= 89; lat += 1) {
-        for (let lon = -179; lon <= 179; lon += 1) {
-            const elevation = Math.sin(lat / 10) * Math.cos(lon / 10) * 5000 // Generate elevation
-            features.push({
-                type: "Feature",
-                properties: {
-                    elevation: elevation,
-                },
-                geometry: {
-                    type: "Polygon",
-                    coordinates: [
-                        [
-                            [lon, lat],
-                            [lon + 1, lat],
-                            [lon + 1, lat + 1],
-                            [lon, lat + 1],
-                            [lon, lat],
-                        ],
-                    ],
-                },
-            })
-        }
-    }
-    return {
-        type: "FeatureCollection",
-        features: features,
-    }
-}
+const ElevationMap = ({ time, setIsLoading }: Props) => {
+    const [points, setPoints] = useState<GeoJsonObject | null>(null)
 
-const ElevationMap: React.FC = () => {
-    const [data, setData] = useState<ElevationData | null>(null)
+    const fetchAndProcessData = useCallback(async () => {
+        setIsLoading(true)
+        try {
+            const response = await fetch(`/data/elevation-geojson/${time}.geojson`)
+            if (!response.ok) throw new Error("Failed to fetch local elevation file")
+            const pointsData = await response.json()
+            console.log(pointsData)
+            setPoints(pointsData)
+        } catch (error) {
+            console.error('Error fetching and processing data:', error)
+            setPoints(null)
+        } finally {
+            setIsLoading(false)
+        }
+    }, [time, setIsLoading])
 
     useEffect(() => {
-        setData(generateElevationData())
-    }, [])
+        fetchAndProcessData()
+    }, [fetchAndProcessData])
 
-    const getColor = (elevation: number): string => {
-        if (elevation < 0) return `rgb(0, 0, ${Math.min(255, Math.abs(elevation) / 20)})`
-        if (elevation < 1000) return `rgb(${elevation / 4}, 255, 0)`
-        if (elevation < 3000) return `rgb(255, ${255 - (elevation - 1000) / 8}, 0)`
-        return `rgb(255, 0, 0)`
-    }
-
-    const style = (feature: any) => {
-        return {
-            fillColor: getColor(feature.properties.elevation),
-            weight: 0,
-            opacity: 1,
-            color: "white",
-            fillOpacity: 0.7,
-        }
-    }
-
-    return (
-        // <MapContainer center={[20, 0]} zoom={3} style={{ height: "100vh", width: "100%" }}>
-        // <TileLayer
-        //  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        //  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        ///> 
-        <>
-            {data && (
-                <GeoJSON
-                    data={data}
-                    style={style}
-                    onEachFeature={(feature, layer) => {
-                        layer.bindPopup(`Elevation: ${feature.properties.elevation.toFixed(2)}m`)
-                    }}
-                />
-            )}
-        </>
-    // </MapContainer> 
-  )
+    return points ? (
+        <GeoJSON
+            key={`${time}-elevation`}
+            data={points}
+            style={(feature) => ({
+                fillColor: feature?.properties?.color,
+                fillOpacity: 0.8,
+                color: '#000',
+                weight: 1,
+            })}
+        />
+    ) : null
 }
 
 export default ElevationMap
-

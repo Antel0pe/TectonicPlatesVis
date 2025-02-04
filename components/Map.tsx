@@ -88,7 +88,7 @@ const Map: React.FC = () => {
                     zoom={2}
                     style={{ height: "100%", width: "100%" }}
                 >
-                    <LayersControl position="topright">
+                    {/* <LayersControl position="topright">
                         {(Object.keys(LAYERS)  as Array<keyof typeof LAYERS>).map(key => {
                             const layer = LAYERS[key as keyof typeof LAYERS];
                             return (
@@ -106,7 +106,9 @@ const Map: React.FC = () => {
                                     )}
                                 </LayersControl.Overlay>)
                         })}
-                    </LayersControl>
+                    </LayersControl> */}
+                    <ElevationMap time={time} setIsLoading={setIsLoading} />
+                    <ReconstructedPointsMap time={time} setIsLoading={setIsLoading} model={model} />
                 </MapContainer>
             </div>
             <div className="bg-black text-white p-4 flex items-center space-x-4">
