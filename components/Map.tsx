@@ -13,6 +13,7 @@ import type { GeoJsonObject } from 'geojson';
 import ReconstructedCoastlinesMap from "./ReconstructedCoastlinesMap"
 import ReconstructedPointsMap from "./ReconstructedPointsMap"
 import ElevationMap from "./ElevationMap"
+import DisplayGeoJsonMap from "./DisplayGeoJson"
 
 export interface ModelConfig {
     start: number
@@ -87,6 +88,7 @@ const Map: React.FC = () => {
                     center={[0, 0]}
                     zoom={2}
                     style={{ height: "100%", width: "100%" }}
+                    maxZoom={5}
                 >
                     {/* <LayersControl position="topright">
                         {(Object.keys(LAYERS)  as Array<keyof typeof LAYERS>).map(key => {
@@ -109,6 +111,7 @@ const Map: React.FC = () => {
                     </LayersControl> */}
                     <ElevationMap time={time} setIsLoading={setIsLoading} />
                     <ReconstructedPointsMap time={time} setIsLoading={setIsLoading} model={model} />
+                    <DisplayGeoJsonMap time={time} setIsLoading={setIsLoading} model={model} fileDirectory={'/data/platePolygons/'} />
                 </MapContainer>
             </div>
             <div className="bg-black text-white p-4 flex items-center space-x-4">

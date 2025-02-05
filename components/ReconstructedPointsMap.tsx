@@ -7,7 +7,7 @@ import modelsConfig from "../models-config.json"
 import { ModelConfig } from "./Map"
 import L from 'leaflet'
 import type { LatLng } from 'leaflet'
-import { fileExists } from "./ReconstructedCoastlinesMap"
+import MarkerClusterGroup from 'react-leaflet-markercluster';
 
 interface Props {
     model: keyof typeof modelsConfig;
@@ -22,80 +22,6 @@ const ReconstructedPointsMap = ({ model, time, setIsLoading }: Props) => {
     const fetchAndProcessData = useCallback(async () => {
         setIsLoading(true)
         try {
-
-            // const filePath = `/data/paleobiodb_cynodontia,mammalia/${time}.json`
-            // const fileExistsLocally = await fileExists(filePath)
-
-            // let paleobioData
-            // if (fileExistsLocally) {
-            //     const response = await fetch(filePath)
-            //     if (!response.ok) throw new Error("Failed to fetch local paleobiodb file")
-            //     paleobioData = await response.json()
-            // } else {
-            //     // File doesn't exist locally, fallback to API request
-            //     // Calculate min_ma based on time prop
-            //     const timeStr = time === 0 ? `max_ma=${1}&min_ma=${0}` : `max_ma=${time}&min_ma=${time - 9}`
-
-            //     // Fetch paleobio data
-            //     const paleobioResponse = await fetch(
-            //         `https://paleobiodb.org/data1.2/occs/list.json?base_name=cynodontia,mammalia&${timeStr}&show=coords,loc,time,phylo`
-            //     )
-            //     if (!paleobioResponse.ok) throw new Error(`Failed to fetch paleobiodb data from API: ${paleobioResponse.statusText}`)
-            //     paleobioData = await paleobioResponse.json()
-            // }
-
-            // // Create GeoJSON FeatureCollection from paleobio data
-            // const features: Feature[] = paleobioData
-            //     .filter((record: any) => record.lng && record.lat)
-            //     .map((record: any): Feature => ({
-            //         type: 'Feature',
-            //         geometry: {
-            //             type: 'Point',
-            //             coordinates: [parseFloat(record.lng), parseFloat(record.lat)]
-            //         },
-            //         properties: {
-            //             id: record.occurrence_no,
-            //             name: record.taxon_name,
-            //             age: record.max_ma,
-            //             color: record.color
-            //         }
-            //     }))
-            // // console.log(features)
-
-            // const featureCollection: FeatureCollection = {
-            //     type: 'FeatureCollection',
-            //     features: features
-            // }
-
-            // if (features.length === 0) {
-            //     console.error('No valid coordinates found in paleobio data')
-            //     return
-            // }
-
-            // // Use Next.js API route instead of calling GPlates directly
-            // const reconstructResponse = await fetch('/api/reconstruct', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify({
-            //         feature_collection: featureCollection,
-            //         time: time,
-            //         model: model
-            //     })
-            // })
-
-            // console.log('sending to api')
-            // console.log(JSON.stringify({
-            //     feature_collection: featureCollection,
-            //     reconstruction_time: time,
-            //     model: model
-            // }))
-
-            // if (!reconstructResponse.ok) {
-            //     throw new Error('Failed to fetch reconstructed points')
-            // }
-
             const response = await fetch(`/data/reconstructedPoints/${time}.geojson`)
             if (!response.ok) throw new Error("Failed to fetch local reconstructed points file")
             const pointsData = await response.json()
@@ -114,21 +40,31 @@ const ReconstructedPointsMap = ({ model, time, setIsLoading }: Props) => {
     }, [fetchAndProcessData])
 
     return points ? (
-        <GeoJSON
-            key={`${time}-${model}`}
-            data={points}
-            pointToLayer={(feature, latlng: LatLng) => {
-                return L.circleMarker(latlng, {
-                    radius: 6,
-                    fillColor: feature['properties']['color'],
-                    color: '#000',
-                    weight: 1,
-                    opacity: 1,
-                    fillOpacity: 0.8,
-                    pane: 'overlayPane'
+        <MarkerClusterGroup
+            iconCreateFunction={(cluster) => {
+                return L.divIcon({
+                    html: `<div class="bg-white/80 border-2 border-gray-600 rounded-full w-10 h-10 flex items-center justify-center">${cluster.getChildCount()}</div>`,
+                    className: ''
                 });
             }}
-        />
+        >
+            <GeoJSON
+                key={`${time}-${model}`}
+                data={points}
+                pointToLayer={(feature, latlng: LatLng) => {
+                    return L.circleMarker(latlng, {
+                        radius: 6,
+                        fillColor: feature['properties']['color'],
+                        color: '#000',
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.8,
+                        pane: 'overlayPane'
+                    });
+                }}
+
+            />
+        </MarkerClusterGroup>
     ) : null
 }
 
