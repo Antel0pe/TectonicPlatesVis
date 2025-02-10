@@ -110,7 +110,7 @@ const Map: React.FC = () => {
                         })}
                     </LayersControl> */}
                     <ElevationMap time={time} setIsLoading={setIsLoading} />
-                    <ReconstructedPointsMap time={time} setIsLoading={setIsLoading} model={model} />
+                    {/* <ReconstructedPointsMap time={time} setIsLoading={setIsLoading} model={model} /> */}
                     <DisplayGeoJsonMap time={time} setIsLoading={setIsLoading} model={model} fileDirectory={'/data/platePolygons/'} />
                 </MapContainer>
             </div>

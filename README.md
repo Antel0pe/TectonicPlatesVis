@@ -15,4 +15,5 @@ To download data locally, go to notebooks\SaveGPlateData.ipynb download data.zip
 Add your config to models-config.json. It is not necessary to add a file path for local data. As fallback the data will be requested from GPlates API
 
 ## Demo
-1. https://x.com/anteloped71/status/1886473126772371475
+1. https://x.com/anteloped71/status/188647312677237147
+2. https://x.com/anteloped71/status/1888741557383377310
